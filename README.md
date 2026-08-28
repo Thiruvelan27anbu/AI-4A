@@ -1,12 +1,6 @@
-# EX. NO. 4(a) – MACHINE LEARNING MODEL: LINEAR REGRESSION
+# EX. NO. 4(a) – MACHINE LEARNING MODEL: LINEAR REGRESSIO
 
-## PAGE 1 – AIM# EX. NO. 5 – BUILDING AND TRAINING A CNN
-
-## AIM
-
-To build and train a **Convolutional Neural Network (CNN)** using TensorFlow for image classification using the **CIFAR-10 dataset**.
-
----
+To build and train a **Convolutional Neural Network (CNN)** using TensorFlow for image classification using the **CIFAR-10 dataset**
 
 # AIM, OBJECTIVES AND REQUIREMENTS
 
