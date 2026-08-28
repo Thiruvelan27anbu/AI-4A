@@ -1,507 +1,532 @@
-# EX-NO.-4a-MACHINE-LEARNING-MODEL-LINEAR-REGRESSION
+# EX. NO. 4(a) – MACHINE LEARNING MODEL: LINEAR REGRESSION
+
+## PAGE 1 – AIM# EX. NO. 5 – BUILDING AND TRAINING A CNN
+
 ## AIM
-To predict house prices using regression models and compare the performance of different machine learning regression models based on RMSE, MAE, and R².
-1.Machine Learning:Machine Learning is used to learn patterns from existing data and make predictions. 
-•	Regression is a supervised learning technique used to predict continuous numerical values. 
-•	In this experiment, regression models are used to predict the price of a house. 
-•	The dataset contains house-related features such as: 
-o	square_feet 
-o	num_rooms 
-o	age 
-o	distance_to_city(km) 
-•	The target variable is: 
-o	price 
-## DATASET DESCRIPTION
-•	Dataset: House Price Dataset 
-•	Problem: Predict house price. 
-•	Features (X): 
-o	square_feet – size of the house. 
-o	num_rooms – number of rooms. 
-o	age – age of the house in years. 
-o	distance_to_city(km) – distance from the city centre. 
-•	Target (y): 
-o	price – continuous house price. 
-## PROBLEM STATEMENT
-•	Develop a machine learning model to predict house prices. 
-•	Use house characteristics as input. 
-•	Train different regression models. 
-•	Compare their prediction performance. 
-•	Select the better-performing model based on evaluation metrics. 
-## REGRESSION MODELS USED
-The uploaded notebook compares the following models:
-1.	Linear Regression 
-2.	Ridge Regression 
-3.	Lasso Regression 
-4.	ElasticNet Regression 
-5.	Polynomial Regression 
-6.	Decision Tree Regressor 
-7.	Random Forest Regressor 
-8.	Gradient Boosting Regressor 
-9.	Support Vector Regressor (SVR) 
-10.	K-Nearest Neighbors (KNN) Regressor 
-### LIBRARIES USED
-import pandas as pd
-import numpy as np
+
+To build and train a **Convolutional Neural Network (CNN)** using TensorFlow for image classification using the **CIFAR-10 dataset**.
+
+---
+
+# AIM, OBJECTIVES AND REQUIREMENTS
+
+## OBJECTIVES
+
+The objectives of this experiment are:
+
+1. To understand the concept of Convolutional Neural Networks.
+2. To load the CIFAR-10 image dataset.
+3. To preprocess and normalize the image data.
+4. To convert class labels into one-hot encoded format.
+5. To visualize sample images from the dataset.
+6. To design a CNN architecture using convolution and pooling layers.
+7. To train the CNN model using the training dataset.
+8. To evaluate the model using accuracy and loss.
+9. To predict the classes of new test images.
+
+## SOFTWARE REQUIREMENTS
+
+* Python
+* Google Colab / Jupyter Notebook
+* TensorFlow
+* Keras
+* NumPy
+* Matplotlib
+
+## HARDWARE REQUIREMENTS
+
+* Computer or Laptop
+* Minimum 4 GB RAM
+* Internet connection for downloading the dataset
+
+---
+
+# INTRODUCTION
+
+## CONVOLUTIONAL NEURAL NETWORK
+
+A **Convolutional Neural Network (CNN)** is a type of Deep Learning model mainly used for image processing and image classification tasks.
+
+Unlike traditional machine learning algorithms, CNNs can automatically learn important features directly from images. These features may include:
+
+* Edges
+* Shapes
+* Textures
+* Patterns
+* Object parts
+
+A CNN processes an image through multiple layers. Each layer extracts more complex information from the image.
+
+For example:
+
+**Input Image → Convolution → ReLU → Pooling → Convolution → Fully Connected Layer → Output Class**
+
+CNNs are widely used in:
+
+* Image classification
+* Face recognition
+* Object detection
+* Medical image analysis
+* Self-driving cars
+* Security systems
+* Handwriting recognition
+
+The main advantage of CNN is that it automatically extracts useful features from images without requiring manual feature engineering.
+
+---
+
+# CIFAR-10 DATASET
+
+## ABOUT THE DATASET
+
+The CIFAR-10 dataset is a commonly used dataset for image classification experiments.
+
+It contains a total of **60,000 color images**.
+
+### Dataset Distribution
+
+| Dataset      | Number of Images |
+| ------------ | ---------------: |
+| Training Set |           50,000 |
+| Test Set     |           10,000 |
+| Total        |           60,000 |
+
+Each image has a size of:
+
+**32 × 32 pixels**
+
+Each image contains three color channels:
+
+* Red
+* Green
+* Blue
+
+Therefore, the input image shape is:
+
+```text
+(32, 32, 3)
+```
+
+## CIFAR-10 CLASSES
+
+The dataset contains the following ten classes:
+
+1. Airplane
+2. Automobile
+3. Bird
+4. Cat
+5. Deer
+6. Dog
+7. Frog
+8. Horse
+9. Ship
+10. Truck
+
+The objective of the CNN model is to correctly classify an input image into one of these ten categories.
+
+---
+
+# IMPORT LIBRARIES AND LOAD DATASET
+
+##IMPORT REQUIRED LIBRARIES
+
+TensorFlow and Keras are used for building the CNN model. Matplotlib is used for visualization, while NumPy is used for numerical operations.
+
+```python
+import tensorflow as tf
+from tensorflow.keras import datasets, layers, models
+from tensorflow.keras.utils import to_categorical
 import matplotlib.pyplot as plt
-import seaborn as sns
+import numpy as np
+```
 
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, PolynomialFeatures
+### DESCRIPTION OF LIBRARIES
 
-from sklearn.linear_model import (
-    LinearRegression,
-    Ridge,
-    Lasso,
-    ElasticNet
-)
+* **TensorFlow** – Used for deep learning and neural networks.
+* **Keras** – Provides simple functions for building CNN models.
+* **Datasets** – Used to load the CIFAR-10 dataset.
+* **Layers** – Used to create CNN layers.
+* **Models** – Used to create the neural network architecture.
+* **NumPy** – Used for numerical operations.
+* **Matplotlib** – Used for displaying images and graphs.
+* **to_categorical()** – Used for one-hot encoding.
 
-from sklearn.tree import DecisionTreeRegressor
+## LOAD CIFAR-10 DATASET
 
-from sklearn.ensemble import (
-    RandomForestRegressor,
-    GradientBoostingRegressor
-)
+```python
+(X_train, y_train), (X_test, y_test) = datasets.cifar10.load_data()
+```
 
-from sklearn.svm import SVR
-from sklearn.neighbors import KNeighborsRegressor
+Here:
 
-from sklearn.metrics import (
-    mean_squared_error,
-    mean_absolute_error,
-    r2_score
-)
-### LOAD THE DATASET
-import pandas as pd
+* `X_train` contains training images.
+* `y_train` contains training labels.
+* `X_test` contains test images.
+* `y_test` contains test labels.
 
-df = pd.read_csv(
-    '/content/drive/MyDrive/Datasets/house_prices_dataset.csv'
-)
+The training dataset is used to teach the CNN, while the test dataset is used to evaluate its performance.
 
-df.head()
-### DATA OVERVIEW
-Display the dataset
-df
-Display information
-df.info()
-Display shape
-df.shape
-Summary statistics
-df.describe()
-Check missing values
-df.isnull().sum()
-## EXPLORATORY DATA ANALYSIS
-Distribution of Features
-The notebook examines the distribution of:
-•	square_feet 
-•	num_rooms 
-•	age 
-•	distance_to_city(km) 
-•	price 
-numeric_features = [
-    'square_feet',
-    'num_rooms',
-    'age',
-    'distance_to_city(km)',
-    'price'
+---
+
+# PAGE 5 – DATA PREPROCESSING AND VISUALIZATION
+
+## STEP 3: NORMALIZE IMAGE DATA
+
+The original pixel values of an image range from **0 to 255**.
+
+For better training performance, the values are converted into the range **0 to 1**.
+
+```python
+X_train = X_train.astype('float32') / 255.0
+X_test = X_test.astype('float32') / 255.0
+```
+
+Normalization improves:
+
+* Training stability
+* Convergence speed
+* Numerical efficiency
+* Model performance
+
+## ONE-HOT ENCODING
+
+The labels are converted into a vector of length 10.
+
+```python
+y_train = to_categorical(y_train, 10)
+y_test = to_categorical(y_test, 10)
+```
+
+For example, if the image belongs to the **Airplane** class:
+
+```text
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+```
+
+If it belongs to the **Cat** class:
+
+```text
+[0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
+```
+
+## STEP 4: VISUALIZE SAMPLE IMAGES
+
+```python
+class_names = [
+    'Airplane', 'Automobile', 'Bird', 'Cat', 'Deer',
+    'Dog', 'Frog', 'Horse', 'Ship', 'Truck'
 ]
 
-for col in numeric_features:
-    plt.figure(figsize=(6,4))
-    sns.histplot(df[col], kde=True, bins=30)
-    plt.title(f'Distribution of {col}')
-    plt.show()
-9. CORRELATION ANALYSIS
-•	Correlation shows the relationship between numerical variables. 
-•	A correlation heatmap is used to visualize these relationships. 
-plt.figure(figsize=(8,6))
+plt.figure(figsize=(10, 10))
 
-sns.heatmap(
-    df.corr(),
-    annot=True,
-    cmap='coolwarm',
-    fmt=".2f"
-)
+for i in range(16):
+    plt.subplot(4, 4, i + 1)
+    plt.xticks([])
+    plt.yticks([])
+    plt.grid(False)
+    plt.imshow(X_train[i])
+    plt.xlabel(class_names[np.argmax(y_train[i])])
 
-plt.title("Feature Correlation Matrix")
 plt.show()
-10. SCATTER PLOTS
-Scatter plots are used to study the relationship between individual features and house price.
-for col in [
-    'square_feet',
-    'num_rooms',
-    'age',
-    'distance_to_city(km)'
-]:
-    plt.figure(figsize=(6,4))
-    sns.scatterplot(x=df[col], y=df['price'])
-    plt.title(f'{col} vs Price')
-    plt.show()
-## OUTLIER DETECTION
-•	Boxplots are used to identify extreme values. 
-•	Outliers may negatively affect regression models. 
-for col in [
-    'square_feet',
-    'num_rooms',
-    'age',
-    'distance_to_city(km)',
-    'price'
-]:
-    plt.figure(figsize=(6,4))
-    sns.boxplot(df[col])
-    plt.title(f'Boxplot of {col}')
-    plt.show()
-## OUTLIER TREATMENT
-The notebook removes extremely low and extremely high house prices using the 1st and 99th percentiles.
-Q1 = df['price'].quantile(0.01)
-Q99 = df['price'].quantile(0.99)
+```
 
-df = df[
-    (df['price'] >= Q1) &
-    (df['price'] <= Q99)
-]
-•	This reduces the effect of extreme house prices. 
-•	It helps the models learn from more typical observations. 
-13. DEFINE FEATURES AND TARGET
-X = df[
-    [
-        'square_feet',
-        'num_rooms',
-        'age',
-        'distance_to_city(km)'
+This code displays a **4 × 4 grid containing 16 sample images** from the CIFAR-10 dataset.
+
+---
+
+# PAGE 6 – BUILDING THE CNN MODEL
+
+## STEP 5: CREATE CNN ARCHITECTURE
+
+The CNN model consists of multiple convolutional layers, pooling layers, dropout layers, and fully connected layers.
+
+```python
+model = models.Sequential()
+
+model.add(layers.Conv2D(
+    32, (3, 3),
+    activation='relu',
+    padding='same',
+    input_shape=(32, 32, 3)
+))
+
+model.add(layers.Conv2D(
+    32, (3, 3),
+    activation='relu',
+    padding='same'
+))
+
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Dropout(0.25))
+```
+
+The first convolutional layers extract basic features such as edges and patterns.
+
+### Second CNN Block
+
+```python
+model.add(layers.Conv2D(
+    64, (3, 3),
+    activation='relu',
+    padding='same'
+))
+
+model.add(layers.Conv2D(
+    64, (3, 3),
+    activation='relu',
+    padding='same'
+))
+
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Dropout(0.25))
+```
+
+The second block extracts more detailed features from the image.
+
+### Third CNN Block
+
+```python
+model.add(layers.Conv2D(
+    128, (3, 3),
+    activation='relu',
+    padding='same'
+))
+
+model.add(layers.Conv2D(
+    128, (3, 3),
+    activation='relu',
+    padding='same'
+))
+
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Dropout(0.25))
+```
+
+The deeper layers learn complex features related to objects and shapes.
+
+---
+
+# PAGE 7 – FULLY CONNECTED LAYERS AND MODEL TRAINING
+
+## FLATTEN AND DENSE LAYERS
+
+The output from the convolutional layers is converted into a one-dimensional vector using the Flatten layer.
+
+```python
+model.add(layers.Flatten())
+
+model.add(layers.Dense(
+    512,
+    activation='relu'
+))
+
+model.add(layers.Dropout(0.5))
+
+model.add(layers.Dense(
+    10,
+    activation='softmax'
+))
+```
+
+### FUNCTIONS OF EACH LAYER
+
+**Flatten Layer:**
+Converts multidimensional feature maps into a single vector.
+
+**Dense Layer:**
+Learns relationships between extracted features.
+
+**Dropout Layer:**
+Randomly disables some neurons during training to reduce overfitting.
+
+**Softmax Layer:**
+Produces probability values for all ten classes.
+
+## STEP 6: COMPILE THE MODEL
+
+```python
+model.compile(
+    optimizer='adam',
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+model.summary()
+```
+
+### PARAMETERS USED
+
+* **Optimizer:** Adam
+* **Loss Function:** Categorical Cross-Entropy
+* **Performance Metric:** Accuracy
+
+## STEP 7: TRAIN THE MODEL
+
+```python
+history = model.fit(
+    X_train,
+    y_train,
+    epochs=30,
+    batch_size=64,
+    validation_split=0.2
+)
+```
+
+The model is trained for **30 epochs** with a batch size of **64**.
+
+---
+
+# PAGE 8 – MODEL PERFORMANCE AND GRAPH ANALYSIS
+
+## STEP 8: PLOT TRAINING HISTORY
+
+The training history contains accuracy and loss values for every epoch.
+
+```python
+plt.figure(figsize=(12, 5))
+
+plt.subplot(1, 2, 1)
+
+plt.plot(
+    history.history['accuracy'],
+    label='Train Accuracy'
+)
+
+plt.plot(
+    history.history['val_accuracy'],
+    label='Validation Accuracy'
+)
+
+plt.title('Model Accuracy')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.legend()
+```
+
+## MODEL LOSS GRAPH
+
+```python
+plt.subplot(1, 2, 2)
+
+plt.plot(
+    history.history['loss'],
+    label='Train Loss'
+)
+
+plt.plot(
+    history.history['val_loss'],
+    label='Validation Loss'
+)
+
+plt.title('Model Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+
+plt.show()
+```
+
+## MODEL ACCURACY ANALYSIS
+
+The training accuracy generally increases as the number of epochs increases. This shows that the CNN model is learning useful features from the training images.
+
+Validation accuracy also improves during the training process. A small difference between training accuracy and validation accuracy indicates that the model is generalizing reasonably well.
+
+If training accuracy becomes much higher than validation accuracy, it may indicate **overfitting**.
+
+## MODEL LOSS ANALYSIS
+
+Training loss decreases as the model learns from the training data.
+
+Validation loss also decreases initially and may fluctuate after several epochs.
+
+This indicates that the model is gradually converging toward an optimal solution.
+
+---
+
+# PAGE 9 – TEST PREDICTION, RESULT AND CONCLUSION
+
+## STEP 9: PREDICT TEST IMAGES
+
+The trained CNN model can now predict the class of unseen test images.
+
+```python
+def plot_predictions(index):
+
+    img = X_test[index]
+
+    true_label = class_names[
+        np.argmax(y_test[index])
     ]
-]
 
-y = df['price']
-•	X → Input features. 
-•	y → Target house price. 
-14. TRAIN-TEST SPLIT
-X_train, X_test, y_train, y_test = train_test_split(
-    X,
-    y,
-    test_size=0.2,
-    random_state=42
-)
-•	80% → Training data 
-•	20% → Testing data 
-## FEATURE SCALING
-The notebook uses StandardScaler.
-scaler = StandardScaler()
-
-X_train_scaled = scaler.fit_transform(X_train)
-
-X_test_scaled = scaler.transform(X_test)
-•	Scaling puts the features on a comparable scale. 
-•	The scaler is fitted only on training data. 
-•	The same transformation is applied to test data. 
-
-## BASELINE MODEL
-The baseline predicts the mean house price for every test observation.
-y_pred_baseline = (
-    np.mean(y_train) *
-    np.ones_like(y_test)
-)
-
-rmse_baseline = np.sqrt(
-    mean_squared_error(y_test, y_pred_baseline)
-)
-
-mae_baseline = mean_absolute_error(
-    y_test,
-    y_pred_baseline
-)
-
-print(
-    f"Baseline RMSE: {rmse_baseline:.2f}, "
-    f"MAE: {mae_baseline:.2f}"
-)
-
-## LINEAR REGRESSION
-•	Linear Regression finds a linear relationship between input features and house price. 
-•	It is used as the main baseline regression model. 
-lr = LinearRegression()
-
-lr.fit(X_train_scaled, y_train)
-
-y_pred_lr = lr.predict(X_test_scaled)
-
-## RIDGE REGRESSION
-•	Ridge Regression is a regularized version of Linear Regression. 
-•	It helps control large model coefficients. 
-ridge = Ridge(alpha=1.0)
-
-ridge.fit(X_train_scaled, y_train)
-
-y_pred_ridge = ridge.predict(X_test_scaled)
-
-## LASSO REGRESSION
-•	Lasso Regression uses L1 regularization. 
-•	It can reduce some feature coefficients toward zero. 
-lasso = Lasso(alpha=0.1)
-
-lasso.fit(X_train_scaled, y_train)
-
-y_pred_lasso = lasso.predict(X_test_scaled)
-
-##  ELASTIC NET REGRESSION
-•	ElasticNet combines L1 and L2 regularization. 
-•	It is useful when several features may contribute to the prediction. 
-elastic = ElasticNet(
-    alpha=0.1,
-    l1_ratio=0.5
-)
-
-elastic.fit(X_train_scaled, y_train)
-
-y_pred_elastic = elastic.predict(X_test_scaled)
-
-##  POLYNOMIAL REGRESSION
-•	Polynomial Regression extends Linear Regression by creating polynomial features. 
-•	The notebook uses degree 2. 
-poly = PolynomialFeatures(degree=2)
-
-X_train_poly = poly.fit_transform(X_train_scaled)
-X_test_poly = poly.transform(X_test_scaled)
-
-poly_lr = LinearRegression()
-
-poly_lr.fit(X_train_poly, y_train)
-
-y_pred_poly = poly_lr.predict(X_test_poly)
-
-##  DECISION TREE REGRESSOR
-•	A Decision Tree divides the data into different regions based on feature values. 
-•	It can model nonlinear relationships. 
-dt = DecisionTreeRegressor(
-    random_state=42
-)
-
-dt.fit(X_train_scaled, y_train)
-
-y_pred_dt = dt.predict(X_test_scaled)
-
-##  RANDOM FOREST REGRESSOR
-•	Random Forest combines multiple decision trees. 
-•	It generally provides more robust predictions than a single tree. 
-rf = RandomForestRegressor(
-    n_estimators=100,
-    random_state=42
-)
-
-rf.fit(X_train_scaled, y_train)
-
-y_pred_rf = rf.predict(X_test_scaled)
-
-##  GRADIENT BOOSTING REGRESSOR
-•	Gradient Boosting builds models sequentially. 
-•	Each new model attempts to improve the errors of previous models. 
-gbr = GradientBoostingRegressor(
-    n_estimators=100,
-    learning_rate=0.1,
-    random_state=42
-)
-
-gbr.fit(X_train_scaled, y_train)
-
-y_pred_gbr = gbr.predict(X_test_scaled)
-
-## SUPPORT VECTOR REGRESSOR
-•	SVR uses Support Vector Machine principles for regression. 
-•	The notebook uses an RBF kernel. 
-svr = SVR(
-    kernel='rbf',
-    C=100,
-    gamma=0.1,
-    epsilon=.1
-)
-
-svr.fit(X_train_scaled, y_train)
-
-y_pred_svr = svr.predict(X_test_scaled)
-
-##  KNN REGRESSOR
-•	KNN predicts a value based on nearby observations. 
-•	The notebook uses 5 neighbors. 
-knn = KNeighborsRegressor(
-    n_neighbors=5
-)
-
-knn.fit(X_train_scaled, y_train)
-
-y_pred_knn = knn.predict(X_test_scaled)
-
-## MODEL EVALUATION
-The notebook uses three metrics:
-RMSE
-•	Root Mean Squared Error. 
-•	Lower value indicates better performance. 
-MAE
-•	Mean Absolute Error. 
-•	Lower value indicates better performance. 
-R²
-•	Measures how well the model explains variation in house prices. 
-•	Higher value generally indicates better performance. 
-Code
-models = {
-    "Linear Regression": y_pred_lr,
-    "Ridge": y_pred_ridge,
-    "Lasso": y_pred_lasso,
-    "ElasticNet": y_pred_elastic,
-    "Polynomial Regression": y_pred_poly,
-    "Decision Tree": y_pred_dt,
-    "Random Forest": y_pred_rf,
-    "Gradient Boosting": y_pred_gbr,
-    "SVR": y_pred_svr,
-    "KNN": y_pred_knn
-}
-
-results = []
-
-for name, y_pred in models.items():
-
-    rmse = np.sqrt(
-        mean_squared_error(y_test, y_pred)
+    pred_probs = model.predict(
+        np.expand_dims(img, axis=0),
+        verbose=0
     )
 
-    mae = mean_absolute_error(
-        y_test,
-        y_pred
+    pred_label = class_names[
+        np.argmax(pred_probs)
+    ]
+
+    plt.imshow(img)
+
+    plt.title(
+        f"True: {true_label} | Pred: {pred_label}"
     )
 
-    r2 = r2_score(
-        y_test,
-        y_pred
-    )
-
-    results.append([
-        name,
-        rmse,
-        mae,
-        r2
-    ])
-
-results_df = pd.DataFrame(
-    results,
-    columns=["Model", "RMSE", "MAE", "R2"]
-)
-
-results_df.sort_values(
-    by="RMSE"
-)
-
-##  MODEL COMPARISON
-<img width="601" height="250" alt="image" src="https://github.com/user-attachments/assets/bca8dfef-1052-4e92-90e1-0f6356888be5" />
-		
-
-### Comparison Criteria
-•	Lower RMSE → Better model. 
-•	Lower MAE → Better model. 
-•	Higher R² → Better model. 
-The notebook sorts the models according to RMSE to compare their performance.
-## ACTUAL VS PREDICTED PRICE
-plt.figure(figsize=(15,12))
-
-for i, (name, y_pred) in enumerate(models.items()):
-
-    plt.subplot(5,2,i+1)
-
-    plt.scatter(
-        y_test,
-        y_pred,
-        alpha=0.5
-    )
-
-    plt.plot(
-        [y_test.min(), y_test.max()],
-        [y_test.min(), y_test.max()],
-        'r--'
-    )
-
-    plt.xlabel("Actual Price")
-    plt.ylabel("Predicted Price")
-    plt.title(f"{name}: Actual vs Predicted")
-
-plt.tight_layout()
-plt.show()
-•	The plot compares actual house prices with predicted prices. 
-•	Points closer to the diagonal line indicate better predictions. 
-30. RESIDUAL ANALYSIS
-•	A residual is the difference between actual and predicted values. 
-Residual = Actual Price − Predicted Price
-for name, y_pred in models.items():
-
-    residuals = y_test - y_pred
-
-    plt.figure(figsize=(6,4))
-
-    sns.scatterplot(
-        x=y_pred,
-        y=residuals,
-        alpha=0.5
-    )
-
-    plt.axhline(
-        0,
-        color='r',
-        linestyle='--'
-    )
-
-    plt.xlabel("Predicted Price")
-    plt.ylabel("Residuals")
-    plt.title(f"{name}: Residual Plot")
-
+    plt.axis('off')
     plt.show()
-•	Residuals close to zero indicate smaller prediction errors. 
-•	Residual plots help identify unusual prediction patterns. 
-##  RANDOM FOREST FEATURE IMPORTANCE
-The notebook calculates the importance of each feature using Random Forest.
-importances = rf.feature_importances_
+```
 
-feat_names = X.columns
+To predict the first five test images:
 
-plt.figure(figsize=(6,4))
+```python
+for i in range(5):
+    plot_predictions(i)
+```
 
-sns.barplot(
-    x=importances,
-    y=feat_names
-)
+The output displays:
 
-plt.title(
-    "Random Forest Feature Importance"
-)
+* The original test image
+* The actual class label
+* The predicted class label
 
-plt.show()
-This helps identify which house features contribute more to the Random Forest prediction.
-##  GRADIENT BOOSTING FEATURE IMPORTANCE
-importances_gbr = gbr.feature_importances_
+## RESULT
 
-plt.figure(figsize=(6,4))
+The CIFAR-10 dataset was successfully loaded and preprocessed. A Convolutional Neural Network containing convolutional, pooling, dropout, flatten, and dense layers was successfully constructed.
 
-sns.barplot(
-    x=importances_gbr,
-    y=feat_names
-)
+The model was trained using the training dataset, and its performance was analyzed using training and validation accuracy and loss graphs. The trained model was also successfully used to predict the classes of unseen test images.
 
-plt.title(  "Gradient Boosting Feature Importance")
-
-plt.show()
-This shows the relative contribution of the house features to the Gradient Boosting model.
-
-## RMSE COMPARISON GRAPH
-plt.figure(figsize=(10,6))
-
-sns.barplot(
-    x="RMSE",
-    y="Model",
-    data=results_df.sort_values("RMSE")
-)
-
-plt.title(
-    "RMSE Comparison Across Regression Models"
-)
-
-plt.show()
-•	The graph provides a visual comparison of model errors. 
-•	The model with the lowest RMSE performs best according to this metric.
 ## CONCLUSION
-Thus, Linear Regression and other regression models were successfully applied for house price prediction, and their performance was compared using standard regression evaluation metrics.
 
+Thus, the **Convolutional Neural Network (CNN)** was successfully implemented and trained using **TensorFlow and the CIFAR-10 dataset**.
+
+The CNN successfully learned image features through convolutional layers and classified images into ten categories: **Airplane, Automobile, Bird, Cat, Deer, Dog, Frog, Horse, Ship, and Truck**.
+
+The performance of the model was evaluated using **accuracy and loss graphs**, and predictions were successfully generated for the test dataset.
+
+Hence, the objective of **building and training a CNN for image classification** was successfully achieved.
+
+### AIM
+
+To predict house prices using regression models and compare the performance of different Machine Learning regression models based on *RMSE, MAE, and R² score*.
+
+### OBJECTIVES
+
+* To load and analyze the House Price Dataset.
+* To perform Exploratory Data Analysis (EDA).
+* To identify and treat outliers.
+* To split the dataset into training and testing data.
+* To apply feature scaling.
+* To train different regression models.
+* To evaluate the models using RMSE, MAE, and R².
+* To compare the performance of all regression models.
+* To identify the best-performing model for house price prediction.
+
+---
+
+# PAGE 2 – THEORY
+
+## MACHINE LEARNING
+
+Machine Learning is a branch of Artificial In…
